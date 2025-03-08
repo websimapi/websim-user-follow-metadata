@@ -82,7 +82,13 @@ function createUserCard(userData, followDate) {
     
     const date = document.createElement('div');
     date.className = 'follow-date';
-    date.textContent = `Following since ${formatDate(followDate)}`;
+    
+    // Fix: Show correct text for followers vs following
+    if (userData.follow.user.id === currentUser.id) {
+        date.textContent = `Followed you on ${formatDate(followDate)}`;
+    } else {
+        date.textContent = `Following since ${formatDate(followDate)}`;
+    }
     
     details.appendChild(username);
     details.appendChild(date);
@@ -233,4 +239,3 @@ async function fetchFollowing() {
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', fetchCurrentUser);
-
