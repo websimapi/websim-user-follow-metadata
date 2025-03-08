@@ -1,0 +1,58 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Follow Metadata</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>User Follow Information</h1>
+            <div id="user-profile" class="profile">
+                <div class="avatar-container">
+                    <img id="user-avatar" src="" alt="User Avatar">
+                </div>
+                <div class="user-info">
+                    <h2 id="username"></h2>
+                    <div class="stats">
+                        <div><span id="following-count">0</span> Following</div>
+                        <div><span id="followers-count">0</span> Followers</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tabs">
+                <button id="followers-tab" class="tab active">Followers</button>
+                <button id="following-tab" class="tab">Following</button>
+            </div>
+        </header>
+        
+        <main>
+            <div id="followers-container" class="user-list active">
+                <div class="loading" id="followers-loading">
+                    <svg class="spinner" viewBox="0 0 50 50">
+                        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                    </svg>
+                    <p>Loading followers...</p>
+                </div>
+                <div id="followers-list"></div>
+                <button id="load-more-followers" class="load-more">Load more</button>
+            </div>
+            
+            <div id="following-container" class="user-list">
+                <div class="loading" id="following-loading">
+                    <svg class="spinner" viewBox="0 0 50 50">
+                        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                    </svg>
+                    <p>Loading following...</p>
+                </div>
+                <div id="following-list"></div>
+                <button id="load-more-following" class="load-more">Load more</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
