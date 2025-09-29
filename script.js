@@ -16,6 +16,8 @@ const userAvatar = document.getElementById('user-avatar');
 const usernameElement = document.getElementById('username');
 const followersCount = document.getElementById('followers-count');
 const followingCount = document.getElementById('following-count');
+const projectsCount = document.getElementById('projects-count');
+const viewsCount = document.getElementById('views-count');
 
 // Function to format date
 function formatDate(dateString) {
@@ -122,6 +124,17 @@ async function fetchCurrentUser() {
         // Initial data loading using the current user's username
         fetchFollowersCount(username);
         fetchFollowingCount(username);
+        
+        // NEW: projects + views
+        projectsCount.textContent = '...';
+        viewsCount.textContent = '...';
+        fetchProjectStats(username).then(({ totalProjects, totalViews }) => {
+            projectsCount.textContent = totalProjects;
+            viewsCount.textContent = totalViews.toLocaleString();
+        }).catch(() => {
+            projectsCount.textContent = '0';
+            viewsCount.textContent = '0';
+        });
         
         // Fetch initial list if the followers tab is active (which it is by default)
         fetchFollowers(username);
@@ -333,6 +346,43 @@ async function fetchFollowing(username) {
     } finally {
         followingLoading.style.display = 'none';
     }
+}
+
+// Fetch project stats
+async function fetchProjectStats(username) {
+    if (!username) throw new Error('No username for project stats');
+    const makePaths = [
+        (c) => `/api/v1/users/${username}/projects?first=50${c ? `&after=${c}` : ''}`,
+        (c) => `/api/v1/user/projects?first=50${c ? `&after=${c}` : ''}`,
+        (c) => `/api/v1/users/${username}/sites?first=50${c ? `&after=${c}` : ''}`,
+    ];
+    for (const makePath of makePaths) {
+        let endCursor = null, hasNext = true;
+        let totalProjects = 0, totalViews = 0;
+        try {
+            while (hasNext) {
+                const url = makePath(endCursor);
+                const res = await fetch(url);
+                const json = await res.json();
+                const bag = json.projects || json.sites || json;
+                const list = bag?.data ?? [];
+                if (!Array.isArray(list)) throw new Error('Unexpected list');
+                for (const item of list) {
+                    const node = item.project || item.site || item;
+                    if (!node) continue;
+                    totalProjects++;
+                    const v = node.views ?? node.view_count ?? node.stats?.views ?? node.metrics?.views ?? 0;
+                    totalViews += Number.isFinite(v) ? v : 0;
+                }
+                hasNext = !!bag?.meta?.has_next_page;
+                endCursor = bag?.meta?.end_cursor ?? null;
+            }
+            return { totalProjects, totalViews };
+        } catch (e) {
+            console.warn('[Project Stats] Path failed:', e);
+        }
+    }
+    throw new Error('All project stats attempts failed');
 }
 
 // Initialize the app
