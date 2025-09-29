@@ -134,7 +134,7 @@ async function fetchFollowersCount() {
     try {
         const response = await fetch(`/api/v1/user/followers?count=true`);
         const data = await response.json();
-        followersCount.textContent = data.followers.meta.count || 0;
+        followersCount.textContent = data.meta.count || 0;
     } catch (error) {
         console.error('Error fetching followers count:', error);
     }
@@ -145,7 +145,7 @@ async function fetchFollowingCount() {
     try {
         const response = await fetch(`/api/v1/user/following?count=true`);
         const data = await response.json();
-        followingCount.textContent = data.following.meta.count || 0;
+        followingCount.textContent = data.meta.count || 0;
     } catch (error) {
         console.error('Error fetching following count:', error);
     }
@@ -173,13 +173,13 @@ async function fetchFollowers() {
         const response = await fetch(`/api/v1/user/followers?${params.toString()}`);
         const data = await response.json();
         
-        followersData.meta.end_cursor = data.followers.meta.end_cursor;
-        followersData.meta.has_next_page = data.followers.meta.has_next_page;
+        followersData.meta.end_cursor = data.meta.end_cursor;
+        followersData.meta.has_next_page = data.meta.has_next_page;
         
-        if (data.followers.data.length === 0 && followersData.data.length === 0) {
+        if (data.data.length === 0 && followersData.data.length === 0) {
             showEmptyState(followersList, 'No followers yet');
         } else {
-            data.followers.data.forEach(item => {
+            data.data.forEach(item => {
                 followersData.data.push(item);
                 const card = createUserCard(item, item.follow.created_at);
                 followersList.appendChild(card);
@@ -216,13 +216,13 @@ async function fetchFollowing() {
         const response = await fetch(`/api/v1/user/following?${params.toString()}`);
         const data = await response.json();
         
-        followingData.meta.end_cursor = data.following.meta.end_cursor;
-        followingData.meta.has_next_page = data.following.meta.has_next_page;
+        followingData.meta.end_cursor = data.meta.end_cursor;
+        followingData.meta.has_next_page = data.meta.has_next_page;
         
-        if (data.following.data.length === 0 && followingData.data.length === 0) {
+        if (data.data.length === 0 && followingData.data.length === 0) {
             showEmptyState(followingList, 'Not following anyone yet');
         } else {
-            data.following.data.forEach(item => {
+            data.data.forEach(item => {
                 followingData.data.push(item);
                 const card = createUserCard(item, item.follow.created_at);
                 followingList.appendChild(card);
