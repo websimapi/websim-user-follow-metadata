@@ -126,10 +126,13 @@ async function fetchCurrentUser() {
         fetchFollowingCount(username);
         
         // NEW: projects + views
-        projectsCount.textContent = '...';
-        viewsCount.textContent = '...';
-        fetchProjectStats(username).then(({ totalProjects, totalViews }) => {
-            projectsCount.textContent = totalProjects;
+        projectsCount.textContent = '0';
+        viewsCount.textContent = '0';
+        fetchProjectStats(username, ({ totalProjects, totalViews }) => {
+            animateCount(projectsCount, totalProjects);
+            animateCount(viewsCount, totalViews);
+        }).then(({ totalProjects, totalViews }) => {
+            projectsCount.textContent = String(totalProjects);
             viewsCount.textContent = totalViews.toLocaleString();
         }).catch(() => {
             projectsCount.textContent = '0';
@@ -349,10 +352,10 @@ async function fetchFollowing(username) {
 }
 
 // Fetch project stats
-async function fetchProjectStats(username) {
+async function fetchProjectStats(username, onProgress) {
     if (!username) throw new Error('No username for project stats');
     const makePaths = [
-        (c) => `/api/v1/users/${username}/projects?first=50${c ? `&after=${c}` : ''}`,
+        (c) => `/api/v1/users/${username}/projects?posted=true&first=50${c ? `&after=${c}` : ''}`,
         (c) => `/api/v1/user/projects?first=50${c ? `&after=${c}` : ''}`,
         (c) => `/api/v1/users/${username}/sites?first=50${c ? `&after=${c}` : ''}`,
     ];
@@ -376,6 +379,7 @@ async function fetchProjectStats(username) {
                 }
                 hasNext = !!bag?.meta?.has_next_page;
                 endCursor = bag?.meta?.end_cursor ?? null;
+                onProgress && onProgress({ totalProjects, totalViews });
             }
             return { totalProjects, totalViews };
         } catch (e) {
@@ -387,3 +391,16 @@ async function fetchProjectStats(username) {
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', fetchCurrentUser);
+
+function animateCount(el, target){
+    const start=Number(el.textContent.replace(/[^0-9]/g,''))||0;
+    const diff=target-start;
+    const dur=300;
+    const t0=performance.now();
+    function step(t){
+        const p=Math.min(1,(t-t0)/dur);
+        el.textContent=Math.round(start+diff*p).toLocaleString();
+        if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
